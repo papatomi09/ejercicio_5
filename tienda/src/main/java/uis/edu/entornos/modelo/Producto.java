@@ -1,6 +1,12 @@
 package uis.edu.entornos.modelo;
 
 import jakarta.persistence.*; // O javax.persistence.* si usas Spring Boot 2
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 import java.math.BigDecimal; // Recomendado para valores monetarios
 
 @Entity
@@ -11,17 +17,39 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relación Many-to-One: Muchos productos a un solo proveedor
-    @ManyToOne(fetch = FetchType.LAZY) // Lazy loading es común para ManyToOne
-    @JoinColumn(name = "idProveedor", nullable = false) // 'idProveedor' es la columna FK en la DB
-    private Proveedor proveedor; // Aquí se mapea el objeto Proveedor
+    // Relación Many-to-One
+    // No usamos @NotNull aquí, sino en el ID del proveedor en caso de DTO,
+    // pero @JoinColumn con nullable = false ya es una restricción DB
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idProveedor", nullable = false)
+    private Proveedor proveedor;
 
+    // Nombre del Producto
+    @NotNull(message = "El nombre no puede ser nulo")
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
+    @Column(length = 100, nullable = false)
     private String nombre;
 
-    private BigDecimal ivaCompra; // Tasa o porcentaje del IVA de compra
+    // IVA de Compra (Usamos BigDecimal para precisión financiera)
+    @NotNull(message = "El IVA de compra es obligatorio")
+    @DecimalMin(value = "0.00", message = "El IVA no puede ser negativo")
+    @DecimalMax(value = "1.00", message = "El IVA debe ser como máximo 1.00 (100%)")
+    @Column(precision = 5, scale = 2) // Ejemplo: 0.19
+    private BigDecimal ivaCompra;
 
+    // Precio de Compra
+    @NotNull(message = "El precio de compra es obligatorio")
+    @DecimalMin(value = "0.01", message = "El precio de compra debe ser mayor a cero")
+    @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal precioCompra;
 
+    // Precio de Venta
+    @NotNull(message = "El precio de venta es obligatorio")
+    @DecimalMin(value = "0.01", message = "El precio de venta debe ser mayor a cero")
+    // Opcional: Validación para que el precio de venta sea mayor o igual al de
+    // compra (requiere lógica personalizada o validación a nivel de servicio)
+    @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal precioVenta;
 
     // Constructor sin argumentos

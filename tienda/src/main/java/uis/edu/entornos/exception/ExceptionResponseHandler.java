@@ -27,8 +27,8 @@ public class ExceptionResponseHandler extends ResponseEntityExceptionHandler {
 
         ExceptionResponse exceptionResponse = new ExceptionResponse(
                 LocalDateTime.now(),
-                "Ocurrio un error",
-                e.getMessage());
+                e.getMessage(),
+                "Ocurrio un error");
 
         return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -48,8 +48,8 @@ public class ExceptionResponseHandler extends ResponseEntityExceptionHandler {
         });
         ExceptionResponse exceptionResponse = new ExceptionResponse(
                 LocalDateTime.now(),
-                "Ocurrio un error",
                 ex.getMessage(),
+                "Ocurrio un error",
                 errors);
 
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);

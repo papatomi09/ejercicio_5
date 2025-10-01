@@ -8,6 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +29,7 @@ public class ProductoController {
     // --- 1. OBTENER TODOS LOS PRODUCTOS (READ All) ---
     // GET /api/productos
     @GetMapping
+    @Operation(summary = "Ver todos los productos que hay", description = "Lista todos los productos")
     public List<Producto> getAllProductos() {
         return productoRepository.findAll();
     }
@@ -33,6 +37,7 @@ public class ProductoController {
     // --- 2. OBTENER UN PRODUCTO POR ID (READ One) ---
     // GET /api/productos/{id}
     @GetMapping("/{id}")
+    @Operation(summary = "Buscar por id", description = "Busca un producto por su ID")
     public ResponseEntity<Producto> getProductoById(@PathVariable Long id) {
         Optional<Producto> productoData = productoRepository.findById(id);
 
@@ -45,8 +50,9 @@ public class ProductoController {
     // El cuerpo de la solicitud debe contener un objeto Producto (incluyendo el
     // Proveedor ID)
     @PostMapping
+    @Operation(summary = "Crear un nuevo producto", description = "Agrega un nuevo producto a la base de datos")
     @ResponseStatus(HttpStatus.CREATED)
-    public Producto createProducto(@RequestBody Producto producto) {
+    public Producto createProducto(@Valid @RequestBody Producto producto) {
         // Spring Data JPA guarda la entidad y devuelve la versión con el ID generado.
         return productoRepository.save(producto);
     }
@@ -54,7 +60,9 @@ public class ProductoController {
     // --- 4. ACTUALIZAR UN PRODUCTO EXISTENTE (UPDATE) ---
     // PUT /api/productos/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> updateProducto(@PathVariable Long id, @RequestBody Producto productoDetails) {
+    @Operation(summary = "Actualizar un producto", description = "Actualiza los detalles de un producto existente")
+    public ResponseEntity<Producto> updateProducto(@Valid @PathVariable Long id,
+            @RequestBody Producto productoDetails) {
         Optional<Producto> productoData = productoRepository.findById(id);
 
         if (productoData.isPresent()) {
@@ -82,6 +90,7 @@ public class ProductoController {
     // --- 5. ELIMINAR UN PRODUCTO (DELETE) ---
     // DELETE /api/productos/{id}
     @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar un producto", description = "Elimina un producto por su ID")
     public ResponseEntity<HttpStatus> deleteProducto(@PathVariable Long id) {
         try {
             productoRepository.deleteById(id);
